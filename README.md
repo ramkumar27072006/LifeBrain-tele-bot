@@ -178,7 +178,7 @@ You can deploy this bot on:
 * Render
 * AWS EC2
 * DigitalOcean
-* Raspberry Pi
+* Raspberry Pi.
 
 (Local PC works fine for college projects.)
 
