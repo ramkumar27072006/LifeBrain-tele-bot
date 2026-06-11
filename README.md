@@ -1,199 +1,93 @@
-# LifeBrain Bot
+# LifeBrain Bot Public Deployment Guide
 
-LifeBrain is a **Telegram productivity assistant** built using **python-telegram-bot**.
-It helps users with calculations, weather updates, news, task reminders, and simple natural chat — **without paid AI APIs**.
+To make your bot available to everyone 24/7, you cannot use Render's free tier for web services anymore. Render automatically puts free services to sleep after 15 minutes of inactivity, which will cause your Telegram bot to stop responding entirely until someone wakes it up.
 
-This project is designed to be:
+Since you need a completely free, zero-downtime hosting solution so anyone can message your bot at any time, the absolute best platform for a Python Telegram bot is PythonAnywhere. It keeps your script running 24 hours a day without sleeping.
 
-*  Free & offline-friendly
-*  Easy to run locally
-*  Suitable for academic projects
-*  Safe for public GitHub sharing
+Here is the exact setup to make your bot public and permanent.
 
 ---
 
-##  Features
+## Step 1: Prepare Your Code for Production
 
-*  Solve math expressions
-*  Get weather by city
-*  Fetch latest news
-*  Add, view, and delete tasks
-*  Task reminders
-*  Daily summary
-*  Simple natural replies (rule-based, no OpenAI)
+Before pushing your final code to GitHub, make sure your Telegram bot doesn't crash if it hits an unexpected error or an invalid user input. Wrap your main polling handler in a `while True` loop with error handling inside your local `main.py` file:
 
----
+```python
+import time
+import logging
 
-##  Project Structure
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 
-```
-bot/
-├── main.py
-├── requirements.txt
-├── .env.example
-├── utils/
-│   ├── solver.py
-│   ├── translator.py
-│   ├── weather.py
-│   ├── news.py
-│   ├── db.py
-│   ├── memory.py
-│   └── daily_summary.py
+def main():
+    while True:
+        try:
+            print("LifeBrain Bot is starting...")
+        except Exception as e:
+            logging.error(f"Bot crashed with error: {e}. Restarting in 15 seconds...")
+            time.sleep(15)
+
+if __name__ == '__main__':
+    main()
 ```
 
----
-
-## Prerequisites
-
-* Python **3.10 or 3.11** ( Python 3.12 may cause dependency issues)
-* Telegram account
+Commit and push this updated code to your GitHub repository.
 
 ---
 
-##  Setup Instructions
+## Step 2: Deploy to PythonAnywhere (24/7 Hosting)
 
-### 1️ Clone the repository
+1. Go to PythonAnywhere and create a free account.
+2. Log in and go to the Consoles tab. Click on Bash to launch a cloud terminal.
+3. Clone your public GitHub repository directly onto their server:
 
 ```bash
-git clone https://github.com/ramkumar27072006/bot.git
-cd bot
+git clone https://github.com/ramkumar27072006/LifeBrain-tele-bot.git
 ```
 
----
-
-### 2️ Create a virtual environment
+4. Move into your project folder and install your code dependencies:
 
 ```bash
-python -m venv venv
+cd LifeBrain-tele-bot
+pip install --user python-telegram-bot
 ```
 
-Activate it:
+---
 
-**Windows**
+## Step 3: Run the Bot Permanently in the Background
+
+If you just run `python main.py`, the bot will stop working the moment you close your browser tab. To prevent this, use the `nohup` command.
 
 ```bash
-venv\Scripts\activate
+nohup python main.py &
 ```
 
-**Linux / macOS**
+What this does:
+
+- The `&` pushes the process to the background.
+- `nohup` keeps it alive even when you log out.
+
+How to check if it's running:
 
 ```bash
-source venv/bin/activate
+ps ux
 ```
 
----
-
-### 3️ Install dependencies
+How to view logs:
 
 ```bash
-pip install -r requirements.txt
+cat nohup.out
 ```
 
 ---
 
-### 4️ Create Telegram Bot Token
+## Step 4: Share Your Bot
 
-1. Open Telegram
-2. Search **@BotFather**
-3. Run:
+Your backend infrastructure is now decoupled from your laptop. The cloud server will keep the bot running.
 
-   ```
-   /start
-   /newbot
-   ```
-4. Copy the **BOT TOKEN**
-
----
-
-### 5️ Create `.env` file
-
-Create a file named `.env` in the project root.
-
-```env
-TELEGRAM_BOT_TOKEN=PASTE_YOUR_BOT_TOKEN_HERE
-```
-
- **Never upload `.env` to GitHub**
-
----
-
-### 6️ Run the bot
-
-```bash
-python main.py
-```
-
-You should see:
-
-```
- LifeBrain Bot running (free version)...
-```
-
----
-
-##  Telegram Commands
-
-| Command                      | Description           |
-| ---------------------------- | --------------------- |
-| `/start`                     | Start the bot         |
-| `/help`                      | Show help menu        |
-| `/solve 25*(4/3)`            | Solve math expression |
-| `/weather chennai`           | Get weather           |
-| `/news ai`                   | Get news              |
-| `/addtask drink water 14:00` | Add task              |
-| `/showtasks`                 | View tasks            |
-| `/deletetask <id>`           | Delete a task         |
-| `/daily 07:00`               | Daily summary         |
-
-You can also **type normal messages** for simple chat replies.
-
----
-
-##  Task Deletion
-
-Tasks can be deleted manually using:
+Give users your Telegram link:
 
 ```text
-/deletetask <task_id>
+https://t.me/YourBotUsername
 ```
 
-(Task IDs are shown in `/showtasks`)
-
----
-
-##  Notes & Limitations
-
-* No OpenAI / paid APIs used
-* Bot must be running locally or on a server
-* Stopping the terminal will stop the bot
-* Best tested on Python **3.10 / 3.11**
-
----
-
-##  Deployment (Optional)
-
-You can deploy this bot on:
-
-* Railway
-* Render
-* AWS EC2
-* DigitalOcean
-* Raspberry Pi.
-
-(Local PC works fine for college projects.)
-
----
-
-##  Author
-
-**Ramkumar R**
-B.Tech AI & Data Science
-Academic / Learning Project
-
----
-
-##  License
-
-This project is open-source and intended for **educational use**.
-
-
+Anyone can open the bot, tap Start, and receive a response from your application.
